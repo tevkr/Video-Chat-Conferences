@@ -1,0 +1,7 @@
+[submodule "PeerJsWebService"] 
+  path = PeerJsWebService
+  url = https://github.com/tevkr/PeerJsWebService.git
+
+[submodule "SocketIoWebService"]
+  path = SocketIoWebService
+  url = https://github.com/tevkr/SocketIoWebService.git
