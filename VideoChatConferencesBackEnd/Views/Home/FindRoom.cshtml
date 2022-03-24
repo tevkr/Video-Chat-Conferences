@@ -14,96 +14,32 @@
             </tr>
         </thead>
         <tbody>
-            <tr id="tr0">
-                <th>ААААААААААААААААААААААААА СЮДА</th>
-                <td>7</td>
-                <td class="icon-check"></td>
-            </tr>
-            <tr id="tr1">
-                <th>Давай сюда</th>
-                <td>2</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr2">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr3">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr4">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr5">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr6">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr7">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr8">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr9">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr10">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr11">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr12">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr13">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr14">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr15">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr16">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
-            <tr id="tr17">
-                <th>Квадро</th>
-                <td>4</td>
-                <td class="icon-close"></td>
-            </tr>
+            @{
+                var count = 0;
+                @foreach (var item in ViewData["Rooms"] as List<VideoChatConferencesBackEnd.Models.RoomModel>)
+                {
+                    count++;
+                    <tr id="@item.RoomId">
+                        <th>@item.Name</th>
+                        <td>@item.UsersCount</td>
+                        @if(item.Password)
+                        {
+                             <td class="icon-check"></td>
+                        }
+                        else
+                        {
+                            <td class="icon-close"></td>
+                        }
+                    </tr>
+                }
+            }
         </tbody>
     </table>
+    <script>
+        function dblclickHandler(e) {
+            if (e.path[1].id != null && e.path[1].id != "")
+                location.href = 'room/' + e.path[1].id;
+        }
+        document.querySelectorAll('tr').forEach(e => e.addEventListener('dblclick', dblclickHandler));
+    </script>
 </div>

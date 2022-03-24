@@ -10,10 +10,11 @@ namespace VideoChatConferencesBackEnd.Services
         {
             Url = "https://socket-io-web-service.herokuapp.com/";
         }
-        public static async void AddRoomAsync(string id, string password)
+        public static async void AddRoomAsync(string name, string id, string password)
         {
             var values = new Dictionary<string, string?>
             {
+                { "name", name },
                 { "roomId", id },
                 { "ownerId", null },
                 { "password", password },
@@ -26,6 +27,11 @@ namespace VideoChatConferencesBackEnd.Services
         public static async Task<bool> IsPasswordCorrect(string roomId, string password)
         {
             var responseString = await Client.GetStringAsync($"{Url}is-password-correct?roomId={roomId}&password={password}");
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(responseString);
+        }
+        public static async Task<bool> IsRoomExists(string roomId)
+        {
+            var responseString = await Client.GetStringAsync($"{Url}is-room-exists?roomId={roomId}");
             return Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(responseString);
         }
         public static async Task<List<RoomModel>?> GetAllRooms()

@@ -27,7 +27,7 @@ showChat.addEventListener("click", () => {
 	document.querySelector(".main-left").style.display = "none";
 	document.querySelector(".back").style.display = "block";
 });
-const user = prompt("Enter your name");
+const user = username;
 
 let myVideoStream;
 navigator.mediaDevices
