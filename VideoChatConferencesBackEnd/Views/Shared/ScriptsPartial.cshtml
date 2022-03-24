@@ -1,0 +1,17 @@
+﻿<script src="~/js/jquery.min.js" asp-append-version="true"></script>
+<script src="~/js/popper.min.js" asp-append-version="true"></script>
+<script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
+<script src="~/js/jquery.sticky.js" asp-append-version="true"></script>
+<script src="~/js/main.js" asp-append-version="true"></script>
+@if (ViewContext.RouteData.Values["Action"].ToString() == "FindRoom")
+{
+    <script src="~/js/fuze.min.js" asp-append-version="true"></script>
+    <script src="~/js/search.js" asp-append-version="true"></script>
+}
+@if (ViewContext.RouteData.Values["Action"].ToString() == "Room")
+{
+    //<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <script src="~/js/room.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,16 @@
+﻿@model RoomViewModel
+<form class="create-room-form" asp-area="" asp-controller="Home" asp-action="CreateRoom" method="post">
+    <div class="mb-3">
+        <label for="nameInput" class="form-label" asp-for="ConferenceName"></label>
+        <input type="text" class="form-control" id="nameInput" maxlength="30" asp-for="ConferenceName" required>
+    </div>
+    <div class="mb-3">
+        <label for="passwordInput" class="form-label" asp-for="ConferencePassword"></label>
+        <input type="password" class="form-control" id="passwordInput" maxlength="15" asp-for="ConferencePassword">
+    </div>
+    <span class="error" asp-validation-for="ConferenceName"></span>
+    <span class="error" asp-validation-for="ConferencePassword"></span>
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <button type="submit" class="btn custom-button custom-hover">Создать</button>
+    </div>
+</form>

@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    @await Html.PartialAsync("MetatagsPartial")
+    @await Html.PartialAsync("CssPartial")
+</head>
+<body>
+    @await Html.PartialAsync("HeaderPartial")
+    @if (ViewContext.RouteData.Values["Action"].ToString() != "Room")
+    {
+        <div class="main-div">
+            <div class="container">
+                <div class="main-div-container-card">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        @RenderBody()
+    }
+    @await Html.PartialAsync("ScriptsPartial")
+</body>
+</html>
