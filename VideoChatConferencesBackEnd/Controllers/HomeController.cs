@@ -6,7 +6,6 @@ namespace VideoChatConferencesBackEnd.Controllers
 {
     public class HomeController : Controller
     {
-        private static List<Guid> RoomIds = new List<Guid>();
         public IActionResult Index()
         {
             return View();
@@ -26,12 +25,12 @@ namespace VideoChatConferencesBackEnd.Controllers
                 return View(model);
             }
             if (String.IsNullOrEmpty(model.ConferencePassword))
+            {
                 model.ConferencePassword = "";
-            var option = new CookieOptions();
-            option.Expires = DateTime.Now.AddMinutes(5);
-            Response.Cookies.Append("vccrp", model.ConferencePassword.ToString(), option);
+            }
+            Response.Cookies.Append("vccrp", model.ConferencePassword.ToString());
             Guid id = Guid.NewGuid();
-            SocketIoWebService.AddRoomAsync(model.ConferenceName, id.ToString(), model.ConferencePassword.ToString());
+            await Task.WhenAll(SocketIoWebService.AddRoomAsync(model.ConferenceName, id.ToString(), model.ConferencePassword.ToString()));
             return Redirect($"/room/{id}");
         }
         [Route("find-room")]
@@ -49,11 +48,15 @@ namespace VideoChatConferencesBackEnd.Controllers
         public IActionResult Room(Guid? id)
         {
             var password = Request.Cookies["vccrp"] == null ? "" : Request.Cookies["vccrp"];
-            var username = Request.Cookies["vccn"];
-            if (id == null || !SocketIoWebService.IsRoomExists(id.ToString()).Result) return Redirect("/error/404");
-            if (SocketIoWebService.IsPasswordCorrect(id.ToString(), password).Result && !String.IsNullOrEmpty(username))
+            var username = Request.Cookies["vccun"];
+            var roomId = Request.Cookies["vccri"];
+            var isRoomExists = SocketIoWebService.IsRoomExists(id.ToString()).Result;
+            var isPasswordCorrect = SocketIoWebService.IsPasswordCorrect(id.ToString(), password).Result;
+            if (id == null || !isRoomExists) return Redirect("/error/404");
+            if (roomId != null && roomId == id.ToString() && isPasswordCorrect)
             {
                 ViewData["Username"] = username;
+                ViewData["UserId"] = Request.Cookies["vccui"];
                 return View();
             }
             return Redirect($"/room/user-params/{id}");
@@ -62,8 +65,10 @@ namespace VideoChatConferencesBackEnd.Controllers
         public IActionResult RoomUserParams(Guid? id)
         {
             var password = Request.Cookies["vccrp"] == null ? "" : Request.Cookies["vccrp"];
-            if (id == null || !SocketIoWebService.IsRoomExists(id.ToString()).Result) return Redirect("/error/404");
-            if (SocketIoWebService.IsPasswordCorrect(id.ToString(), password).Result)
+            var isRoomExists = SocketIoWebService.IsRoomExists(id.ToString()).Result;
+            var isPasswordCorrect = SocketIoWebService.IsPasswordCorrect(id.ToString(), password).Result;
+            if (id == null || !isRoomExists) return Redirect("/error/404");
+            if (isPasswordCorrect)
             {
                 ViewData["Settings"] = "name";
                 return View(new UserParametersViewModel());
@@ -75,20 +80,26 @@ namespace VideoChatConferencesBackEnd.Controllers
         [Route("room/user-params/{id?}")]
         public async Task<IActionResult> RoomUserParams(Guid? id, UserParametersViewModel model)
         {
-            if (id == null || !SocketIoWebService.IsRoomExists(id.ToString()).Result) return Redirect("/error/404");
-            if (String.IsNullOrEmpty(model.Password))
-                model.Password = Request.Cookies["vccrp"] == null ? "" : Request.Cookies["vccrp"];
+            var password = Request.Cookies["vccrp"] == null ? "" : Request.Cookies["vccrp"];
+            var isRoomExists = SocketIoWebService.IsRoomExists(id.ToString()).Result;
+            if (id == null || !isRoomExists) return Redirect("/error/404");
+            if (String.IsNullOrEmpty(model.Password)) model.Password = password;
             if (String.IsNullOrEmpty(model.Name))
             {
                 ModelState.AddModelError(nameof(UserParametersViewModel.Password), "Некорректное имя пользователя");
                 return View(model);
             }
-            if (SocketIoWebService.IsPasswordCorrect(id.ToString(), model.Password.ToString()).Result)
+            var isPasswordCorrect = SocketIoWebService.IsPasswordCorrect(id.ToString(), model.Password).Result;
+            if (isPasswordCorrect)
             {
-                var option = new CookieOptions();
-                option.Expires = DateTime.Now.AddMinutes(5);
-                Response.Cookies.Append("vccn", model.Name.ToString(), option);
-                Response.Cookies.Append("vccrp", model.Password.ToString(), option);
+                Response.Cookies.Append("vccun", model.Name.ToString());
+                Response.Cookies.Append("vccrp", model.Password.ToString());
+                Response.Cookies.Append("vccri", id.ToString());
+                if (String.IsNullOrEmpty(Request.Cookies["vccui"]))
+                    Response.Cookies.Append("vccui", Guid.NewGuid().ToString());
+                var hasOwner = SocketIoWebService.HasOwner(id.ToString()).Result;
+                if (!hasOwner)
+                    await Task.WhenAll(SocketIoWebService.SetOwner(id.ToString(), Request.Cookies["vccui"]));
                 return Redirect($"/room/{id}");
             }
             ModelState.AddModelError(nameof(UserParametersViewModel.Password), "Неправильный пароль");

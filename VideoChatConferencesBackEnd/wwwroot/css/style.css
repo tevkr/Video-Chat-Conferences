@@ -610,6 +610,7 @@ video {
 }
 
 .options-right {
+  display: flex;
   margin-left: auto;
 }
 
