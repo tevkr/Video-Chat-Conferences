@@ -36,10 +36,14 @@
         </tbody>
     </table>
     <script>
-        function dblclickHandler(e) {
+        /*function dblclickHandler(e) {
             if (e.path[1].id != null && e.path[1].id != "")
                 location.href = 'room/' + e.path[1].id;
         }
-        document.querySelectorAll('tr').forEach(e => e.addEventListener('dblclick', dblclickHandler));
+        document.querySelectorAll('tr').forEach(e => e.addEventListener('dblclick', dblclickHandler));*/
+        function goToRoom(roomId) {
+            location.href = 'room/' + roomId;
+        }
+        document.querySelectorAll('tr').forEach(e => e.setAttribute("onclick", "goToRoom(this.id)"));
     </script>
 </div>
