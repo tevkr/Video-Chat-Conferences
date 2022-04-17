@@ -113,7 +113,7 @@
         function muteUnmuteButtonHandler() {
             var muteUnmuteButton = document.getElementById('muteUnmute');
             var peerId = muteUnmuteButton.getAttribute("name");
-            socket.emit("mute-unmute", peerId);
+            socket.emit("mute-unmute", peerId, getHash());
             var adminAudioVideoPeer = adminAudioVideoPeers.find(function(value, index) {
 	            if(value.peerId == peerId)
 		            return true;
@@ -125,7 +125,7 @@
         function offOnButtonHandler() {
             var offOnButton = document.getElementById('offOn');
             var peerId = offOnButton.getAttribute("name");
-            socket.emit("on-off", peerId);
+            socket.emit("on-off", peerId, getHash());
             var adminAudioVideoPeer = adminAudioVideoPeers.find(function(value, index) {
 	            if(value.peerId == peerId)
 		            return true;
@@ -135,7 +135,7 @@
             offOnButton.classList.toggle("icon-videocam_off", adminAudioVideoPeer.camOffed);
         }
         function closeConf() {
-            socket.emit("close-room");
+            socket.emit("close-room", getHash());
         }
     </script>
 }else
