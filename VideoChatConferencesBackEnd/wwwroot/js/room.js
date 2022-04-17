@@ -1,3 +1,14 @@
+localStorage.openpages = Date.now();
+var onLocalStorageEvent = function (e) {
+    if (e.key == "openpages") {
+        localStorage.page_available = Date.now();
+    }
+    if (e.key == "page_available") {
+        window.location.href = "already-connected";
+    }
+};
+window.addEventListener('storage', onLocalStorageEvent, false);
+
 const socket = io('socket-io-web-service.herokuapp.com');
 const peer = new Peer(undefined, {
     host: 'peer-js-web-service.herokuapp.com',
