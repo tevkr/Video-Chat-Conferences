@@ -15,7 +15,7 @@
       	            <p>Вы действительно хотите завершить конференцию?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" style="background:#618BFF" onclick="closeConf()">Завершить конференцию</button>
+                    <button id="closeConferenceButton" type="button" class="btn btn-primary" style="background:#618BFF">Завершить конференцию</button>
                 </div>
             </div>
         </div>
@@ -31,11 +31,11 @@
       	            <div style="display: flex; flex-wrap: wrap; flex-direction: column; align-content: center; justify-content: center; align-items: baseline;">
       		            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;">
 	      		            <p style="display: contents;">Вкл/Выкл вебкамеру</p>
-		      	            <i id="muteUnmute" name="" class="ic icon-microphone" style="font-size: 40px; color: black; cursor:pointer;" onclick="muteUnmuteButtonHandler()"></i>
+		      	            <i id="muteUnmute" name="" class="ic icon-microphone" style="font-size: 40px; color: black; cursor:pointer;"></i>
       		            </div>
       		            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;">
 		      	            <p style="display: contents;">Вкл/Выкл микрофон</p>
-		      	            <i id="offOn" name="" class="ic icon-videocam" style="font-size: 40px; color: black; cursor:pointer;" onclick="offOnButtonHandler()"></i>
+		      	            <i id="offOn" name="" class="ic icon-videocam" style="font-size: 40px; color: black; cursor:pointer;"></i>
       		            </div>
       	            </div>
                 </div>
@@ -88,57 +88,3 @@
         </div>
     </div>
 </div>
-@if ((bool)ViewData["IsOwner"])
-{
-    <script>
-        function videoClickHandler(peerId) {
-            if (peerId != peer._id)
-            {
-                var myModal = new bootstrap.Modal(document.getElementById('muteUnmuteModal'));
-                var muteUnmuteButton = document.getElementById('muteUnmute');
-                var offOnButton = document.getElementById('offOn');
-                muteUnmuteButton.setAttribute("name", peerId);
-                offOnButton.setAttribute("name", peerId);
-                var adminAudioVideoPeer = adminAudioVideoPeers.find(function(value, index) {
-	                if(value.peerId == peerId)
-		                return true;
-                });
-                muteUnmuteButton.classList.toggle("icon-microphone", !adminAudioVideoPeer.micMuted);
-                muteUnmuteButton.classList.toggle("icon-microphone-slash", adminAudioVideoPeer.micMuted);
-                offOnButton.classList.toggle("icon-videocam", !adminAudioVideoPeer.camOffed);
-                offOnButton.classList.toggle("icon-videocam_off", adminAudioVideoPeer.camOffed);
-                myModal.show();
-            }
-        }
-        function muteUnmuteButtonHandler() {
-            var muteUnmuteButton = document.getElementById('muteUnmute');
-            var peerId = muteUnmuteButton.getAttribute("name");
-            socket.emit("mute-unmute", peerId, getHash());
-            var adminAudioVideoPeer = adminAudioVideoPeers.find(function(value, index) {
-	            if(value.peerId == peerId)
-		            return true;
-            });
-            adminAudioVideoPeer.micMuted = !adminAudioVideoPeer.micMuted;
-            muteUnmuteButton.classList.toggle("icon-microphone", !adminAudioVideoPeer.micMuted);
-            muteUnmuteButton.classList.toggle("icon-microphone-slash", adminAudioVideoPeer.micMuted);
-        }
-        function offOnButtonHandler() {
-            var offOnButton = document.getElementById('offOn');
-            var peerId = offOnButton.getAttribute("name");
-            socket.emit("on-off", peerId, getHash());
-            var adminAudioVideoPeer = adminAudioVideoPeers.find(function(value, index) {
-	            if(value.peerId == peerId)
-		            return true;
-            });
-            adminAudioVideoPeer.camOffed = !adminAudioVideoPeer.camOffed;
-            offOnButton.classList.toggle("icon-videocam", !adminAudioVideoPeer.camOffed);
-            offOnButton.classList.toggle("icon-videocam_off", adminAudioVideoPeer.camOffed);
-        }
-        function closeConf() {
-            socket.emit("close-room", getHash());
-        }
-    </script>
-}else
-{
-    <script> function videoClickHandler(id) {} </script>
-}

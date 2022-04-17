@@ -108,7 +108,7 @@ peer.on("open", (id) => {
 const addVideoStream = (video, stream, peerId) => {
     video.srcObject = stream;
     video.setAttribute("id", peerId);
-    video.setAttribute("onclick", "videoClickHandler(this.id)");
+    video.onclick = function () { videoClickHandler(this.id) };
     video.addEventListener("loadedmetadata", () => {
         video.play();
         videoGrid.append(video);
@@ -286,3 +286,62 @@ const adminSwitchVideo = (peerId) => {
         }
     }
 };
+var ccb = document.getElementById("closeConferenceButton");
+var mu = document.getElementById("muteUnmute");
+var oo = document.getElementById("offOn");
+if (ccb != null) {
+    ccb.onclick = function () { closeConf() };
+}
+if (mu != null) {
+    mu.onclick = function () { muteUnmuteButtonHandler() };
+}
+if (oo != null) {
+    oo.onclick = function () { offOnButtonHandler() };
+}
+
+function muteUnmuteButtonHandler() {
+    var muteUnmuteButton = document.getElementById('muteUnmute');
+    var peerId = muteUnmuteButton.getAttribute("name");
+    socket.emit("mute-unmute", peerId, getHash());
+    var adminAudioVideoPeer = adminAudioVideoPeers.find(function (value, index) {
+        if (value.peerId == peerId)
+            return true;
+    });
+    adminAudioVideoPeer.micMuted = !adminAudioVideoPeer.micMuted;
+    muteUnmuteButton.classList.toggle("icon-microphone", !adminAudioVideoPeer.micMuted);
+    muteUnmuteButton.classList.toggle("icon-microphone-slash", adminAudioVideoPeer.micMuted);
+}
+function offOnButtonHandler() {
+    var offOnButton = document.getElementById('offOn');
+    var peerId = offOnButton.getAttribute("name");
+    socket.emit("on-off", peerId, getHash());
+    var adminAudioVideoPeer = adminAudioVideoPeers.find(function (value, index) {
+        if (value.peerId == peerId)
+            return true;
+    });
+    adminAudioVideoPeer.camOffed = !adminAudioVideoPeer.camOffed;
+    offOnButton.classList.toggle("icon-videocam", !adminAudioVideoPeer.camOffed);
+    offOnButton.classList.toggle("icon-videocam_off", adminAudioVideoPeer.camOffed);
+}
+function closeConf() {
+    socket.emit("close-room", getHash());
+}
+
+function videoClickHandler(peerId) {
+    if (ccb != null && peerId != peer._id) {
+        var myModal = new bootstrap.Modal(document.getElementById('muteUnmuteModal'));
+        var muteUnmuteButton = document.getElementById('muteUnmute');
+        var offOnButton = document.getElementById('offOn');
+        muteUnmuteButton.setAttribute("name", peerId);
+        offOnButton.setAttribute("name", peerId);
+        var adminAudioVideoPeer = adminAudioVideoPeers.find(function (value, index) {
+            if (value.peerId == peerId)
+                return true;
+        });
+        muteUnmuteButton.classList.toggle("icon-microphone", !adminAudioVideoPeer.micMuted);
+        muteUnmuteButton.classList.toggle("icon-microphone-slash", adminAudioVideoPeer.micMuted);
+        offOnButton.classList.toggle("icon-videocam", !adminAudioVideoPeer.camOffed);
+        offOnButton.classList.toggle("icon-videocam_off", adminAudioVideoPeer.camOffed);
+        myModal.show();
+    }
+}
