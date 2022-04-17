@@ -29,7 +29,7 @@ namespace VideoChatConferencesBackEnd.Services
             var responseString = await Client.GetStringAsync($"{Url}has-owner?roomId={roomId}");
             return Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(responseString);
         }
-        public static async Task SetOwner(string roomId, string ownerId)
+        public static async Task<bool> SetOwnerIfNotExists(string roomId, string ownerId)
         {
             var values = new Dictionary<string, string?>
             {
@@ -37,12 +37,21 @@ namespace VideoChatConferencesBackEnd.Services
                 { "ownerId", ownerId }
             };
             var content = new FormUrlEncodedContent(values);
-            var response = await Client.PostAsync($"{Url}set-owner", content);
+            var response = await Client.PostAsync($"{Url}set-owner-if-not-exists", content);
             var responseString = await response.Content.ReadAsStringAsync();
+            if (responseString == "\"success\"")
+                return true;
+            else
+                return false;
         }
         public static async Task<bool> IsPasswordCorrect(string roomId, string password)
         {
             var responseString = await Client.GetStringAsync($"{Url}is-password-correct?roomId={roomId}&password={password}");
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(responseString);
+        }
+        public static async Task<bool> IsOwner(string roomId, string userId)
+        {
+            var responseString = await Client.GetStringAsync($"{Url}is-owner?roomId={roomId}&userId={userId}");
             return Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(responseString);
         }
         public static async Task<bool> IsRoomExists(string roomId)

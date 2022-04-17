@@ -668,10 +668,15 @@ video {
     font-size: 1.2rem;
     width: 50px;
     margin: 0 0.5rem;
+    cursor:pointer;
 }
 
 .background-red {
   background-color: #f6484a;
+}
+
+.background-admin {
+    background-color: #3aebca;
 }
 
 .main-right {
@@ -735,6 +740,7 @@ video {
     display: -webkit-flex;
     display: flex;
     flex-direction: column;
+    word-break: break-all;
 }
 
     .message > b {

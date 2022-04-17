@@ -2,6 +2,47 @@
     const username = "@(ViewData["Username"])";
     const userId = "@(ViewData["UserId"])";
 </script>
+@if ((bool)ViewData["IsOwner"])
+{
+    <div class="modal fade" id="deleteRoomModal" tabindex="-1" aria-labelledby="deleteRoomModalLabel" aria-hidden="true" style="z-index: 7000;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteRoomModalLabel">Завершить конференцию</h5>
+                    <i class="ic icon-close" style="font-size: 30px; color: black; cursor: pointer;" data-dismiss="modal" aria-label="Close"></i>
+                </div>
+                <div class="modal-body">
+      	            <p>Вы действительно хотите завершить конференцию?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" style="background:#618BFF" onclick="closeConf()">Завершить конференцию</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="muteUnmuteModal" tabindex="-1" aria-labelledby="muteUnmuteModalLabel" aria-hidden="true" style="z-index: 7000;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="muteUnmuteModalLabel">Настройки выбранного пользователя</h5>
+                    <i class="ic icon-close" style="font-size: 30px; color: black; cursor: pointer;" data-dismiss="modal" aria-label="Close"></i>
+                </div>
+                <div class="modal-body">
+      	            <div style="display: flex; flex-wrap: wrap; flex-direction: column; align-content: center; justify-content: center; align-items: baseline;">
+      		            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;">
+	      		            <p style="display: contents;">Вкл/Выкл вебкамеру</p>
+		      	            <i id="muteUnmute" name="" class="ic icon-microphone" style="font-size: 40px; color: black; cursor:pointer;" onclick="muteUnmuteButtonHandler()"></i>
+      		            </div>
+      		            <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px;">
+		      	            <p style="display: contents;">Вкл/Выкл микрофон</p>
+		      	            <i id="offOn" name="" class="ic icon-videocam" style="font-size: 40px; color: black; cursor:pointer;" onclick="offOnButtonHandler()"></i>
+      		            </div>
+      	            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 <div class="main-room-div">
     <div class="main-left">
         <div class="videos-group">
@@ -25,9 +66,9 @@
                 <div id="inviteButton" class="options-button">
                     <i class="ic icon-user-plus"></i>
                 </div>
-                @if (false)
+                @if ((bool)ViewData["IsOwner"])
                 {
-                    <div id="deleteRoom" class="options-button" style="background: #3aebca;">
+                    <div id="deleteRoom" class="options-button" style="background: #3aebca;" data-toggle="modal" data-target="#deleteRoomModal">
 					    <i class="ic icon-delete_forever" style="font-size: 40px; color: black;"></i>
 			    	</div>
                 }
@@ -40,22 +81,64 @@
         </div>
         <div class="main-message-container">
             <span class="ic back icon-chevron-left"></span>
-            <input id="chatMessage" type="text" autocomplete="off" placeholder="Напишите сообщение">
+            <input id="chatMessage" type="text" autocomplete="off" placeholder="Напишите сообщение" maxlength="256">
             <div id="send" class="options-button">
                 <i class="ic icon-send2" aria-hidden="true"></i>
             </div>
         </div>
     </div>
 </div>
-@if (false)
+@if ((bool)ViewData["IsOwner"])
 {
     <script>
-        function videodblclickHandler(e) {
-            var vidId = e.target['id'];
-            console.log(vidId);
+        function videoClickHandler(peerId) {
+            if (peerId != peer._id)
+            {
+                var myModal = new bootstrap.Modal(document.getElementById('muteUnmuteModal'));
+                var muteUnmuteButton = document.getElementById('muteUnmute');
+                var offOnButton = document.getElementById('offOn');
+                muteUnmuteButton.setAttribute("name", peerId);
+                offOnButton.setAttribute("name", peerId);
+                var adminAudioVideoPeer = adminAudioVideoPeers.find(function(value, index) {
+	                if(value.peerId == peerId)
+		                return true;
+                });
+                muteUnmuteButton.classList.toggle("icon-microphone", !adminAudioVideoPeer.micMuted);
+                muteUnmuteButton.classList.toggle("icon-microphone-slash", adminAudioVideoPeer.micMuted);
+                offOnButton.classList.toggle("icon-videocam", !adminAudioVideoPeer.camOffed);
+                offOnButton.classList.toggle("icon-videocam_off", adminAudioVideoPeer.camOffed);
+                myModal.show();
+            }
+        }
+        function muteUnmuteButtonHandler() {
+            var muteUnmuteButton = document.getElementById('muteUnmute');
+            var peerId = muteUnmuteButton.getAttribute("name");
+            socket.emit("mute-unmute", peerId);
+            var adminAudioVideoPeer = adminAudioVideoPeers.find(function(value, index) {
+	            if(value.peerId == peerId)
+		            return true;
+            });
+            adminAudioVideoPeer.micMuted = !adminAudioVideoPeer.micMuted;
+            muteUnmuteButton.classList.toggle("icon-microphone", !adminAudioVideoPeer.micMuted);
+            muteUnmuteButton.classList.toggle("icon-microphone-slash", adminAudioVideoPeer.micMuted);
+        }
+        function offOnButtonHandler() {
+            var offOnButton = document.getElementById('offOn');
+            var peerId = offOnButton.getAttribute("name");
+            socket.emit("on-off", peerId);
+            var adminAudioVideoPeer = adminAudioVideoPeers.find(function(value, index) {
+	            if(value.peerId == peerId)
+		            return true;
+            });
+            adminAudioVideoPeer.camOffed = !adminAudioVideoPeer.camOffed;
+            offOnButton.classList.toggle("icon-videocam", !adminAudioVideoPeer.camOffed);
+            offOnButton.classList.toggle("icon-videocam_off", adminAudioVideoPeer.camOffed);
+        }
+        function closeConf() {
+            socket.emit("close-room");
         }
     </script>
 }else
 {
-    <script> function videodblclickHandler(e) {} </script>
+    <script> function videoClickHandler(id) {} </script>
 }
