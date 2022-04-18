@@ -1,13 +1,13 @@
 ﻿@model UserParametersViewModel
 <form class="create-room-form" asp-area="" asp-controller="Home" asp-action="RoomUserParams" method="post">
     <div class="mb-3">
-        <label for="nameInput" class="form-label" asp-for="Name"></label>
+        <label for="nameInput" class="form-label required" asp-for="Name"></label>
         <input type="text" class="form-control" id="nameInput" maxlength="10" asp-for="Name" required>
     </div>
     @if (ViewData["Settings"] == "name_password")
     {
         <div class="mb-3">
-            <label for="passwordInput" class="form-label" asp-for="Password"></label>
+            <label for="passwordInput" class="form-label required" asp-for="Password"></label>
             <input type="password" class="form-control" id="passwordInput" maxlength="15" asp-for="Password">
         </div>
     }

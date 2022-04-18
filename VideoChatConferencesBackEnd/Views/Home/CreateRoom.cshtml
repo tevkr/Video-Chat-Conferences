@@ -1,7 +1,7 @@
 ﻿@model RoomViewModel
 <form class="create-room-form" asp-area="" asp-controller="Home" asp-action="CreateRoom" method="post">
     <div class="mb-3">
-        <label for="nameInput" class="form-label" asp-for="ConferenceName"></label>
+        <label for="nameInput" class="form-label required" asp-for="ConferenceName"></label>
         <input type="text" class="form-control" id="nameInput" maxlength="30" asp-for="ConferenceName" required>
     </div>
     <div class="mb-3">
