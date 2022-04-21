@@ -44,6 +44,9 @@
         function goToRoom(roomId) {
             location.href = 'room/' + roomId;
         }
-        document.querySelectorAll('tr').forEach(e => e.setAttribute("onclick", "goToRoom(this.id)"));
+        document.querySelectorAll('tr').forEach(e => {
+            if (e.id != null && e.id != '')
+                e.setAttribute("onclick", "goToRoom(this.id)");
+        });
     </script>
 </div>
