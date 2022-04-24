@@ -67,9 +67,7 @@ navigator.mediaDevices
             adminAudioVideoPeers = adminAudioVideoPeers.filter(function (value, index, arr) {
                 return value.peerId != user.peerId;
             });
-            removeVideoStream(peerId);
-        });
-        socket.on("user-data", (connectedUser) => {
+            peer.connections[peerId][0].close();
             removeVideoStream(peerId);
         });
         socket.on("on-off", (peerId) => {
